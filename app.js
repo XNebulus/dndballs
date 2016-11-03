@@ -1,6 +1,5 @@
 (function () {
     window.onload = function () {
-        var canvas = document.getElementById('canvas');
-        BALLDD.init(canvas)
+        BALLDD.init(document.getElementById('canvas1'));
     }
 })();

@@ -1,31 +1,27 @@
-var BALLDD = {
-    
-    canvas: null,
-    balls: [],
-    selected: null,
-    
-    init: function (canvas) {
+var BALLDD = (function () {
+    var me = {}, canvas = null, balls = [], selected = null;
+
+    me.init = function (canvasExt) {
         var ball1, ball2, ball3;
-        this.canvas = canvas;
-        this.canvas.onmousedown = function(evt) { BALLDD.startMove(evt);};
-        this.canvas.onmousemove = this.mouseMove;
-        this.canvas.onmouseup = this.stopMove;
-        ball1 = new this.Ball(100, 100, 'red', 50);
-        ball2 = new this.Ball(200, 200, 'green', 50);
-        ball3 = new this.Ball(100, 300, 'blue', 50);
-        this.balls.push(ball1);
-        this.balls.push(ball2);
-        this.balls.push(ball3);
-        //this.balls = balls;
+        canvas = canvasExt;
+        canvas.onmousedown = startMove;
+        canvas.onmousemove = mouseMove;
+        canvas.onmouseup = stopMove;
+        ball1 = new Ball(100, 60, 'red', 50);
+        ball2 = new Ball(200, 160, 'green', 50);
+        ball3 = new Ball(300, 260, 'blue', 50);
+        balls.push(ball1);
+        balls.push(ball2);
+        balls.push(ball3);
         setTimeout(function () {
-            BALLDD.frame();
+            frame();
         }, 20);
-        this.draw();
-    },
-    startMove: function (evt) {
-        var pos = {}, 
-            selected = BALLDD.selected, 
-            balls = this.balls;
+        draw();
+    };
+    return me;
+
+    function startMove(evt) {
+        var pos = {};
         pos.x = evt.pageX - canvas.offsetLeft;
         pos.y = evt.pageY - canvas.offsetTop;
         for (var i = 0, max = balls.length; i < max; i++) {
@@ -34,25 +30,23 @@ var BALLDD = {
             var distanceFromCenter = Math.sqrt(Math.pow(ball.x - pos.x, 2) + Math.pow(ball.y - pos.y, 2))
             if (distanceFromCenter <= ball.radius) {
                 if (selected != null) selected.isSelected = false;
-                BALLDD.selected = ball;
+                selected = ball;
                 ball.isSelected = true;
-                BALLDD.draw();
+                draw();
                 return;
             }
         }
-    },
-    mouseMove: function (evt) {
-        var selected = BALLDD.selected,
-            canvas = BALLDD.canvas;
+    }
+
+    function mouseMove(evt) {
         if (selected) {
             selected.x = evt.pageX - canvas.offsetLeft;
             selected.y = evt.pageY - canvas.offsetTop;
-            BALLDD.draw();
+            draw();
         }
-    },
-    stopMove: function () {
-        var selected = BALLDD.selected,
-            canvas = BALLDD.canvas;
+    }
+
+    function stopMove() {
         if (selected.x >= canvas.width / 2) {
             selected.isMoving = true;
         }
@@ -60,12 +54,11 @@ var BALLDD = {
             selected.isMoving = false;
         }
         selected.isSelected = false;
-        BALLDD.selected = null;
-    },
-    draw: function () {
-        var canvas = this.canvas,
-            context = canvas.getContext("2d"),
-            balls = this.balls;
+        selected = null;
+    }
+
+    function draw() {
+        var context = canvas.getContext("2d");
         context.clearRect(0, 0, canvas.width, canvas.height);
 
         for (var i = 0; i < balls.length; i++) {
@@ -86,16 +79,15 @@ var BALLDD = {
             context.fill();
             context.stroke();
         }
-        
+
         context.beginPath();
         context.lineWidth = 1;
-        context.moveTo(canvas.width / 2 , 0);
+        context.moveTo(canvas.width / 2, 0);
         context.lineTo(canvas.width / 2, canvas.height);
         context.stroke();
-    },
-    frame: function () {
-        var balls = this.balls,
-            canvas = this.canvas;
+    }
+
+    function frame() {
         for (var i = 0; i < balls.length; i++) {
             var ball = balls[i];
             if (ball.isMoving) {
@@ -111,12 +103,13 @@ var BALLDD = {
                 }
             }
         }
-        this.draw();
+        draw();
         setTimeout(function () {
-            BALLDD.frame();
+            frame();
         }, 20);
-    },
-    Ball: function (x, y, color, radius) {
+    }
+
+    function Ball(x, y, color, radius) {
         this.x = x;
         this.y = y;
         this.color = color;
@@ -126,4 +119,5 @@ var BALLDD = {
         this.dx = 1;
         this.dy = 1;
     }
-};
+
+})();
